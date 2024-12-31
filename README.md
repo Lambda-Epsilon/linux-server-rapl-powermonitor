@@ -32,8 +32,6 @@ To use this utility, ensure your system meets the following prerequisites:
 - **MSR Module**: The Linux MSR driver must be enabled. Load it using:
   ```bash
   sudo modprobe msr
-  chmod +x rapl_power
-  sudo ./rapl_power
   
 ## Explanation
 
