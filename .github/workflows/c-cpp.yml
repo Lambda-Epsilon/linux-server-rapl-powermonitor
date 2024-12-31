@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - [published]
+      types: [published]
 
 jobs:
   build-and-release:
