@@ -2,7 +2,7 @@
 
 Power efficiency is an important factor for small-scale servers, such as those running in a home or lab environment. While a hardware watt-meter is the most direct way to measure power usage, not everyone has access to one (I certainly don't!). This script provides a software-based solution to measure the power consumption of your Intel CPU(s) using Intel's Running Average Power Limit (RAPL) interface.
 
-This utility is specifically designed for Linux servers and offers an easy-to-use, accurate way to monitor CPU package power consumption.
+This utility is specifically designed for Linux servers and offers an easy way to estimate CPU package power consumption.
 
 ---
 
@@ -34,12 +34,32 @@ To use this utility, ensure your system meets the following prerequisites:
   sudo modprobe msr
   chmod +x rapl_power
   sudo ./rapl_power
-
+  
 ## Explanation
 
-The energy unit is calculated from `MSR_RAPL_POWER_UNIT (0x606)`. It is extracted using the bitmask `0x1F00` and shifted by 8 bits. This value varies between CPUs and defines the smallest measurable energy unit.
+- **Multiple CPU Packages**  
+  The script identifies each CPU’s package by reading  
+  `/sys/devices/system/cpu/cpuN/topology/physical_package_id`.  
+  This ensures only one CPU per socket for RAPL reads.
 
-The script maps packages to logical CPUs using the topology data. This ensures correct power readings on systems with multiple CPU sockets.
+- **Reading RAPL MSRs**  
+  Intel exposes power/energy data via `/dev/cpu/<n>/msr`.  
+  - **MSR_RAPL_POWER_UNIT (0x606)** holds scaling factors.  
+  - **MSR_PKG_ENERGY_STATUS (0x611)** reports cumulative package energy usage.
+
+- **Energy Unit**  
+  Bits `[12:8]` of `0x606` store `raw_unit`. The energy tick is:
+
+  $$
+  \mathrm{energy_{unit}} = \frac{1}{2^{\mathrm{raw_{unit}}}}
+  $$
+
+  Since different CPUs can have different `raw_unit` values, reading it at runtime is required.
+
+- **Power Measurement**  
+  The script reads an initial energy value, waits (e.g., 5s), then reads again.  
+  The difference (in Joules) over that interval (in seconds) yields power in Watts, printed per package and in total.
+
 
 ## Disclaimer
 
