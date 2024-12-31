@@ -11,7 +11,8 @@
 #define MSR_RAPL_POWER_UNIT 0x606
 #define MSR_PKG_ENERGY_STATUS 0x611
 
-#define MAX_PACKAGES 2     // arbitrary value, I haven't tested beyond 2, you can modify this at will
+//arbitrary value, modify at will, only 2 was tested
+#define MAX_PACKAGES 2
 
 static int open_msr(int cpu) {
     char msr_filename[32];
