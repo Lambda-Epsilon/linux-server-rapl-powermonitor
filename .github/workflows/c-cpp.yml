@@ -1,9 +1,8 @@
 name: Build and Release
 
 on:
-  push:
-    tags:
-      types: [published]
+  release:
+    types: [published]
 
 jobs:
   build-and-release:
