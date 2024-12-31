@@ -1,6 +1,6 @@
 # linux-server-rapl-powermonitor
 
-Power efficiency is a important factor for small-scale servers, such as those running in a home or lab environment. While a hardware watt-meter is the most direct way to measure power usage, not everyone has access to one (I certainly don't!). This script provides a software-based solution to measure the power consumption of your Intel CPU(s) using Intel's Running Average Power Limit (RAPL) interface.
+Power efficiency is an important factor for small-scale servers, such as those running in a home or lab environment. While a hardware watt-meter is the most direct way to measure power usage, not everyone has access to one (I certainly don't!). This script provides a software-based solution to measure the power consumption of your Intel CPU(s) using Intel's Running Average Power Limit (RAPL) interface.
 
 This utility is specifically designed for Linux servers and offers an easy-to-use, accurate way to monitor CPU package power consumption.
 
