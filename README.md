@@ -1,4 +1,4 @@
-# ubuntu-server-rapl-powermonitor
+# linux-server-rapl-powermonitor
 
 Power efficiency is a crucial factor for small-scale servers, such as those running in a home or lab environment. While a hardware watt-meter is the most direct way to measure power usage, not everyone has access to one (I certainly don't!). This script provides a software-based solution to measure the power consumption of your Intel CPU(s) using Intel's Running Average Power Limit (RAPL) interface.
 
@@ -44,5 +44,7 @@ The script maps packages to logical CPUs using the topology data. This ensures c
 ## Disclaimer
 
 I have not tested the complete accuracy of this script using a watt-meter. This script is only meant to give a rough estimate of the power used by your CPUs.
+
+Furthermore, this has only been tested on Ubuntu 22.04 LTS.
 
 
