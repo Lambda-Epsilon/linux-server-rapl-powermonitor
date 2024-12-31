@@ -1,12 +1,14 @@
 # Makefile
 
-CC = gcc
-CFLAGS = -O2 -Wall
+CC      = gcc
+CFLAGS  = -O2 -Wall
+TARGET  = rapl_monitor
+SOURCE  = rapl-power.c
 
-all: rapl_monitor
+all: $(TARGET)
 
-rapl_monitor: rapl_monitor.c
-	$(CC) $(CFLAGS) -o rapl_monitor rapl_monitor.c
+$(TARGET): $(SOURCE)
+	$(CC) $(CFLAGS) -o $(TARGET) $(SOURCE)
 
 clean:
-	rm -f rapl_monitor
+	rm -f $(TARGET)
