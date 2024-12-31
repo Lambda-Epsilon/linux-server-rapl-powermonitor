@@ -1,13 +1,12 @@
-name: C/C++ Build and Test
+name: Build and Release
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - 'v*'     # This will trigger on tags like v1.0, v2.0.1, etc.
 
 jobs:
-  build-and-test:
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +18,21 @@ jobs:
 
       - name: Build
         run: make
-        
-      - name: Run tests
-        run: make test
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: "Release ${{ github.ref_name }}"
+          # You can set 'draft: true' or 'prerelease: true' if you like
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./myprogram        # <--- The path to your compiled binary
+          asset_name: myprogram         # <--- The filename visible in the release
+          asset_content_type: application/octet-stream
