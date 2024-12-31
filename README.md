@@ -65,6 +65,6 @@ To use this utility, ensure your system meets the following prerequisites:
 
 I have not tested the complete accuracy of this script using a watt-meter. This script is only meant to give a rough estimate of the power used by your CPUs.
 
-Furthermore, this has only been tested on Ubuntu 22.04 LTS.
+Furthermore, this has only been tested on Ubuntu 22.04 LTS, on a dual Xeon E5-2690 v4 processor setup.
 
 
