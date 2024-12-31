@@ -11,9 +11,7 @@
 #define MSR_RAPL_POWER_UNIT 0x606
 #define MSR_PKG_ENERGY_STATUS 0x611
 
-#define MAX_PACKAGES 16
-#define ENERGY_UNIT_MASK 0x1F00
-#define ENERGY_UNIT_OFFSET 8
+#define MAX_PACKAGES 2 //Arbitrary value, I haven't tested beyond 2, you can modify this at will
 
 static int open_msr(int cpu) {
     char msr_filename[32];
@@ -58,8 +56,10 @@ static int detect_packages(int *package_map) {
 
 int main() {
     int package_map[MAX_PACKAGES];
+    double energy_unit[MAX_PACKAGES];
     for (int i = 0; i < MAX_PACKAGES; i++) {
         package_map[i] = -1;
+        energy_unit[i] = 0.0;
     }
 
     int total_packages = detect_packages(package_map);
@@ -73,20 +73,28 @@ int main() {
         printf("Package %d mapped to CPU %d\n", i, package_map[i]);
     }
 
-    double energy_unit;
-    int fd = open_msr(package_map[0]);
-    uint64_t msr_value = read_msr(fd, MSR_RAPL_POWER_UNIT);
-    close(fd);
+    // --------------------------------
+    // Compute the energy units per package
+    // --------------------------------
+    for (int i = 0; i < total_packages; i++) {
+        int fd = open_msr(package_map[i]);
+        uint64_t msr_value = read_msr(fd, MSR_RAPL_POWER_UNIT);
+        close(fd);
 
-    energy_unit = pow(0.5, (msr_value & ENERGY_UNIT_MASK) >> ENERGY_UNIT_OFFSET);
-    printf("Energy unit: %.10f Joules\n", energy_unit);
+        // We extract bits 12:8 for energy status unit
+        // 1/(2^raw_unit). Alternatively, one could use pow(0.5, raw_unit).
+        uint64_t raw_unit = (msr_value >> 8) & 0x1F;  // bits [12:8]
+        energy_unit[i] = 1.0 / (1 << raw_unit);
+
+        printf("Package %d: Energy unit = %.10f Joules\n", i, energy_unit[i]);
+    }
 
     double initial_energy[MAX_PACKAGES], final_energy[MAX_PACKAGES], power[MAX_PACKAGES];
     int sampling_time = 5;
 
     for (int i = 0; i < total_packages; i++) {
-        fd = open_msr(package_map[i]);
-        initial_energy[i] = read_msr(fd, MSR_PKG_ENERGY_STATUS) * energy_unit;
+        int fd = open_msr(package_map[i]);
+        initial_energy[i] = read_msr(fd, MSR_PKG_ENERGY_STATUS) * energy_unit[i];
         close(fd);
     }
 
@@ -94,8 +102,8 @@ int main() {
     sleep(sampling_time);
 
     for (int i = 0; i < total_packages; i++) {
-        fd = open_msr(package_map[i]);
-        final_energy[i] = read_msr(fd, MSR_PKG_ENERGY_STATUS) * energy_unit;
+        int fd = open_msr(package_map[i]);
+        final_energy[i] = read_msr(fd, MSR_PKG_ENERGY_STATUS) * energy_unit[i];
         close(fd);
     }
 
